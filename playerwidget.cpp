@@ -134,8 +134,8 @@ void PlayerWidget::openMedia()
 	QString file = QFileDialog::getOpenFileName(0, "Open a video");
 	if (file.isEmpty())
 		return;
-    playState = true;
-	m_player->play(file);
+    m_player->setFile(file);
+    playPause();
 }
 
 /*! \brief seek media.
@@ -158,17 +158,15 @@ void PlayerWidget::seek(int pos)
 */
 void PlayerWidget::playPause()
 {
+    playState = !playState;
 
     if (!m_player->isPlaying()) {
             m_player->play();
-            return;
     }
     else{
         m_player->pause(!m_player->isPaused());
-        changePlayPause();
     }
-
-    playState = !playState;
+    changePlayPause();
 }
 
 /*! \brief stops the playback.
@@ -179,6 +177,7 @@ void PlayerWidget::stopVideo(){
     m_player->stop();
     playState = false;
     changePlayPause();
+    m_slider->setValue(0);
 }
 
 /*! \brief change play/pause button icon.
