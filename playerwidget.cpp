@@ -105,8 +105,8 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 	connect(m_nextF, SIGNAL(clicked()), SLOT(nextFrame()));
 
 	/** Widget minimum sizes */
-	this->setMinimumHeight(480);
-	this->setMinimumWidth(480);
+    this->setFixedHeight(480);
+    this->setFixedWidth(480);
 }
 
 /*************************************************************************** PRIVATE METHODS ************/
@@ -148,6 +148,7 @@ void PlayerWidget::seek(int pos)
 	if (!m_player->isPlaying())
 		return;
 	m_player->seek(pos * 1000LL); // to msecs
+    emitterCheck();
 }
 
 /*! \brief play/pause functions.
@@ -167,6 +168,7 @@ void PlayerWidget::playPause()
         m_player->pause(!m_player->isPaused());
     }
     changePlayPause();
+    emitterCheck();
 }
 
 /*! \brief stops the playback.
@@ -178,6 +180,7 @@ void PlayerWidget::stopVideo(){
     playState = false;
     changePlayPause();
     m_slider->setValue(0);
+    emit playbackStop();
 }
 
 /*! \brief change play/pause button icon.
@@ -186,6 +189,8 @@ void PlayerWidget::stopVideo(){
 *	the player behavior.
 */
 void PlayerWidget::changePlayPause(){
+    if(!m_player->isPlaying()) return;
+
     if(playState){
         m_playBtn->setToolTip("Pause");
         m_playBtn->setIcon(QIcon(pause));
@@ -243,6 +248,12 @@ void PlayerWidget::nextFrame(){
 */
 qint64 PlayerWidget::currentFrameNumber(qint64 ofFrame){
 	return ((ofFrame*m_player->statistics().video.frame_rate) / 1000LL);
+}
+
+
+void PlayerWidget::emitterCheck(){
+    if(playState==false)
+        emit frameChanged();
 }
 
 /*************************************************************************** PUBLIC METHODS ************/

@@ -13,6 +13,42 @@ class QLabel;
 class PlayerWidget : public QWidget
 {
     Q_OBJECT
+
+private:
+    //	Player objects
+    QtAV::VideoRenderer *m_vo;
+    QtAV::AVPlayer *m_player;
+
+    //	Slider
+    QSlider *m_slider;
+
+    //	Buttons objects
+    QPushButton *m_openBtn;		//TODO: remove this in the final version
+    QPushButton *m_playBtn;
+    QPushButton *m_stopBtn;
+    QPushButton *m_info;
+    QPushButton *m_prevF;
+    QPushButton *m_nextF;
+
+    //	Button's icons objects
+    QPixmap play;
+    QPixmap pause;
+    QPixmap stop;
+    QPixmap prevF;
+    QPixmap nextF;
+
+    //	Help var
+    bool playState;
+
+    // Default stuff
+    void initializeIcons();
+    void changePlayPause();
+
+    // Signal emitter controller
+    void emitterCheck();
+
+    qint64 currentFrameNumber(qint64);
+
 public:
 	explicit PlayerWidget(QWidget *parent = 0);
 	
@@ -46,38 +82,8 @@ private Q_SLOTS:
 	void nextFrame();
 	
 signals:
-
-private:
-	//	Player objects
-	QtAV::VideoRenderer *m_vo;
-	QtAV::AVPlayer *m_player;
-    
-	//	Slider
-	QSlider *m_slider;
-	
-	//	Buttons objects
-	QPushButton *m_openBtn;		//TODO: remove this in the final version
-	QPushButton *m_playBtn;
-	QPushButton *m_stopBtn;
-	QPushButton *m_info;
-	QPushButton *m_prevF;
-	QPushButton *m_nextF;
-
-	//	Button's icons objects
-    QPixmap play;
-    QPixmap pause;
-    QPixmap stop;
-    QPixmap prevF;
-    QPixmap nextF;
-
-	//	Help var
-    bool playState;
-
-	// Default stuff
-    void initializeIcons();
-    void changePlayPause();
-
-	qint64 currentFrameNumber(qint64);
+    void playbackStop();
+    void frameChanged();
 };
 
 #endif // PLAYERWIDGET_H
