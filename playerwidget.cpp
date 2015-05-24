@@ -159,7 +159,8 @@ void PlayerWidget::seek(int pos)
 */
 void PlayerWidget::playPause()
 {
-    playState = !playState;
+    if(m_player->file()!="")
+        playState = !playState;
 
     if (!m_player->isPlaying()) {
             m_player->play();
@@ -189,7 +190,7 @@ void PlayerWidget::stopVideo(){
 *	the player behavior.
 */
 void PlayerWidget::changePlayPause(){
-    if(!m_player->isPlaying()) return;
+    //if(!m_player->isPlaying()) return;
 
     if(playState){
         m_playBtn->setToolTip("Pause");
