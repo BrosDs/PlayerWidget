@@ -69,6 +69,7 @@ public:
 	qint64 toNextFrame();
 	qint64 toPreviousFrame();
 
+    qint64 positionFromFrameNumber(qint64);
 
 private Q_SLOTS:
 	
@@ -84,6 +85,7 @@ private Q_SLOTS:
 signals:
     void playbackStop();
     void frameChanged();
+    void playbackPlay();
 };
 
 #endif // PLAYERWIDGET_H

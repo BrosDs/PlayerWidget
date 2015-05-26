@@ -105,8 +105,7 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 	connect(m_nextF, SIGNAL(clicked()), SLOT(nextFrame()));
 
 	/** Widget minimum sizes */
-    this->setFixedHeight(480);
-    this->setFixedWidth(480);
+    setMinimumSize(480,320);
 }
 
 /*************************************************************************** PRIVATE METHODS ************/
@@ -161,6 +160,7 @@ void PlayerWidget::playPause()
 {
     if(m_player->file()!="")
         playState = !playState;
+    else return;
 
     if (!m_player->isPlaying()) {
             m_player->play();
@@ -215,6 +215,7 @@ void PlayerWidget::updateSlider()
 {
 	m_slider->setRange(0, int(m_player->duration() / 1000LL));
 	m_slider->setValue(int(m_player->position() / 1000LL));
+    emit playbackPlay();
 }
 
 //TODO: Check formula
@@ -225,7 +226,8 @@ void PlayerWidget::updateSlider()
 *	@see toPreviousFrame()
 */
 void PlayerWidget::previousFrame(){
-	m_player->setPosition(m_player->position() - m_player->statistics().video.frame_rate);
+    m_player->setPosition(positionFromFrameNumber(currentFrameNumber()));
+    emit frameChanged();
 }
 
 //TODO: Check formula
@@ -236,19 +238,21 @@ void PlayerWidget::previousFrame(){
 *	@see toNextFrame()
 */
 void PlayerWidget::nextFrame(){
-	m_player->setPosition(m_player->position() + m_player->statistics().video.frame_rate);
+
+    m_player->setPosition(positionFromFrameNumber(currentFrameNumber()+2));
+    emit frameChanged();
 }
 
 /*! \brief Get current frame number.
 *
 *	This functions is used to get the current frame number.
-*	@param frameNumber
+*	@param playerPosition
 *	@return current frame number.
 *	@see previousFrameNumber()
 *	@see nextFrameNumber()
 */
-qint64 PlayerWidget::currentFrameNumber(qint64 ofFrame){
-	return ((ofFrame*m_player->statistics().video.frame_rate) / 1000LL);
+qint64 PlayerWidget::currentFrameNumber(qint64 playerPosition){
+    return ((playerPosition*m_player->statistics().video.frame_rate) / 1000LL);
 }
 
 
@@ -299,50 +303,54 @@ qint64 PlayerWidget::currentFrameNumber(){
 	return ((m_player->position()*m_player->statistics().video.frame_rate) / 1000LL);
 }
 
-//TODO: Check formula
 /*! \brief Get the previous frame number.
 *
 *	This functions is used to get the previous frame number.
 *	@return previous frame number.
 */
 qint64 PlayerWidget::previousFrameNumber(){
-	qint64 prevFrame = m_player->position() - m_player->statistics().video.frame_rate;
-	return currentFrameNumber(prevFrame);
+    return currentFrameNumber()-1;
 }
 
 //TODO: Check formula
 /*! \brief Get the previous frame number.
 *
-*	This functions is used to get the previous frame number.
-*	@param current frame number
+*	This functions is used to get the previous frame number from the current player position.
+*	@param player position
 *	@return previous frame number.
 */
-qint64 PlayerWidget::previousFrameNumber(qint64 ofFrame){
-	qint64 prevFrame = ofFrame - m_player->statistics().video.frame_rate;
-	return currentFrameNumber(prevFrame);
+qint64 PlayerWidget::previousFrameNumber(qint64 playerPosition){
+    return currentFrameNumber(playerPosition)-1;
 }
 
-//TODO: Check formula
 /*! \brief Get the next frame number.
 *
 *	This functions is used to get the next frame number.
 *	@return next frame number.
 */
 qint64 PlayerWidget::nextFrameNumber(){
-	qint64 prevFrame = m_player->position() + m_player->statistics().video.frame_rate;
-	return currentFrameNumber(prevFrame);
+    return currentFrameNumber()+1;
 }
 
-//TODO: Check formula
 /*! \brief Get the next frame number.
 *
-*	This functions is used to get the next frame number.
-*	@param current frame number
+*	This functions is used to get the next frame number from the current player position.
+*	@param player position
 *	@return next frame number.
 */
-qint64 PlayerWidget::nextFrameNumber(qint64 ofFrame){
-    qint64 prevFrame = ofFrame + m_player->statistics().video.frame_rate;
-	return currentFrameNumber(prevFrame);
+qint64 PlayerWidget::nextFrameNumber(qint64 playerPosition){
+    return currentFrameNumber(playerPosition)+1;
+}
+
+
+/*! \brief Get position from frame number.
+*
+*	This functions is used to get the player position from the frame number given in input.
+*	@param frame number
+*   @return player position
+*/
+qint64 PlayerWidget::positionFromFrameNumber(qint64 frame){
+    return (frame/m_player->statistics().video.frame_rate) * 1000LL;
 }
 
 /*! \brief Set media to display.
